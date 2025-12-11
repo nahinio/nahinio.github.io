@@ -1,0 +1,13 @@
+- name: "Certified Web Developer"
+  organization: "Udacity"
+  details: "Full stack web development certification covering React, Node.js, and Databases."
+  date: "2023-08-10"
+  credential_url: "https://example.com/cert"
+  image_url: "https://i.imgur.com/NSIkTOv.png"
+
+- name: "UI/UX Design Master"
+  organization: "Google"
+  details: "Advanced principles of user interface and user experience design."
+  date: "2023-12-05"
+  credential_url: "https://example.com/cert2"
+  image_url: "https://i.imgur.com/WbWTkRq.png"

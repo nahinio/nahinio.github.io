@@ -1,0 +1,461 @@
+---
+layout: default
+permalink: /brain-log/
+title: Brain Log
+weight: 4
+---
+
+<!-- 
+    Brain Log Timeline (Final Visual Refinement)
+    Features: 
+    - Structure: Alternating Vertical Timeline (Left/Right)
+    - Theme: Blue Minimal
+    - Feature: Bordered Dates connected to Spine
+    - Mobile: Ultra-responsive connected layout (Specificity Fixed)
+-->
+
+<div class="container mt-5">
+
+    <!-- HEADER -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-12 text-center">
+            <h2 class="font-weight-bold" style="color: var(--secondary);">Brain Log</h2>
+            <p class="text-muted">A timeline of thoughts.</p>
+        </div>
+    </div>
+
+    <div class="timeline-container">
+        <!-- Central Spine -->
+        <div class="timeline-spine"></div>
+
+        {% assign sorted_thoughts = site.data.brain_log | sort: 'date' | reverse %}
+        {% assign current_month_year = "" %}
+        {% assign month_counter = 0 %}
+
+        {% for item in sorted_thoughts %}
+
+        {% assign item_month_year = item.date | date: "%B %Y" %}
+        {% assign item_year = item.date | date: "%Y" %}
+        {% assign item_month = item.date | date: "%B" %}
+
+        <!-- GROUP BY MONTH/YEAR -->
+        {% if current_month_year != item_month_year %}
+
+        <!-- Close previous group -->
+        {% if current_month_year != "" %}
+    </div> <!-- End timeline-month-content -->
+</div> <!-- End timeline-month-group -->
+{% endif %}
+
+{% assign current_month_year = item_month_year %}
+{% assign month_counter = month_counter | plus: 1 %}
+
+<!-- START NEW MONTH GROUP -->
+<div class="timeline-month-group">
+
+    <!-- Month Header / Trigger -->
+    <div class="month-header-wrapper" onclick="toggleMonth(this)">
+        <span class="month-label">{{ item_month }} <span class="year-label">{{ item_year }}</span></span>
+        <i class="fas fa-chevron-down toggle-icon {% if month_counter == 1 %}rotated{% endif %}"></i>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="timeline-month-content" style="display: {% if month_counter == 1 %}block{% else %}none{% endif %};">
+        {% endif %}
+
+        <!-- TIMELINE ITEM (Alternating Left/Right) -->
+        <div class="timeline-item {% cycle 'left', 'right' %} wow fadeInUp" data-wow-delay=".1s">
+
+            <!-- Content Side -->
+            <div class="timeline-content-wrapper">
+                <div class="timeline-card">
+                    {% if item.title %}
+                    <h4 class="timeline-title">{{ item.title }}</h4>
+                    {% endif %}
+                    <p class="timeline-text">{{ item.thought }}</p>
+                </div>
+            </div>
+
+            <!-- Spine Dot -->
+            <div class="timeline-dot"></div>
+
+            <!-- Date Side (with connector logic) -->
+            <div class="timeline-date-wrapper">
+                <span class="date-text">{{ item.date | date: "%b %d, %H:%M" }}</span>
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        <!-- Close Final Group -->
+        {% if current_month_year != "" %}
+    </div>
+</div>
+{% endif %}
+
+</div>
+</div>
+
+<style>
+    /* VARIABLES (Blue Minimal) */
+    :root {
+        --timeline-line: rgba(138, 180, 248, 0.3);
+        --timeline-accent: #8ab4f8;
+        /* Blue */
+        --timeline-card-bg: transparent;
+        --timeline-dot-bg: #fff;
+        --page-bg: #ffffff;
+        /* Standard Light Theme BG */
+    }
+
+    [data-theme="dark"] {
+        --timeline-dot-bg: #111;
+        --timeline-card-bg: transparent;
+        --page-bg: #121212;
+    }
+
+    [data-theme="light"] {
+        --timeline-accent: #007bff;
+        --timeline-card-bg: transparent;
+        --page-bg: #ffffff;
+    }
+
+    /* CONTAINER */
+    .timeline-container {
+        position: relative;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 0;
+    }
+
+    /* SPINE */
+    .timeline-spine {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 1px;
+        /* Thinner spine for minimal look */
+        background: var(--timeline-line);
+        transform: translateX(-50%);
+        z-index: 0;
+    }
+
+    /* MONTH GROUP */
+    .timeline-month-group {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 40px;
+    }
+
+    /* HEADER */
+    .month-header-wrapper {
+        position: relative;
+        text-align: center;
+        background: var(--page-bg);
+        width: fit-content;
+        margin: 0 auto 30px auto;
+        padding: 6px 24px;
+        border: 1px solid var(--timeline-line);
+        border-radius: 50px;
+        /* Full Pill */
+        cursor: pointer;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s;
+        box-shadow: 0 0 0 8px var(--page-bg);
+        /* Larger halo */
+    }
+
+    .month-header-wrapper:hover {
+        border-color: var(--timeline-accent);
+    }
+
+    .month-label {
+        font-weight: 700;
+        color: var(--secondary);
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+    }
+
+    .year-label {
+        opacity: 0.6;
+        font-weight: 400;
+    }
+
+    .toggle-icon {
+        font-size: 0.8rem;
+        color: var(--timeline-accent);
+        transition: transform 0.3s;
+    }
+
+    .toggle-icon.rotated {
+        transform: rotate(180deg);
+    }
+
+    /* ITEMS - DESKTOP DEFAULT */
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 50px;
+        position: relative;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* WRAPPERS - DESKTOP DEFAULT */
+    .timeline-content-wrapper,
+    .timeline-date-wrapper {
+        width: 45%;
+        position: relative;
+    }
+
+    /* CONTENT STYLING */
+    .timeline-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--secondary);
+        margin-bottom: 6px;
+    }
+
+    .timeline-text {
+        font-size: 1rem;
+        color: var(--secondary);
+        opacity: 0.85;
+        line-height: 1.6;
+    }
+
+    /* DATE STYLING (PC) uses .timeline-date-wrapper directly */
+    .timeline-date-wrapper {
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .timeline-date-wrapper .date-text {
+        display: inline-block;
+        padding: 6px 16px;
+        border: 1px solid var(--timeline-line);
+        border-radius: 50px;
+        background: var(--page-bg);
+        color: var(--timeline-accent);
+        font-weight: 600;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* DOT */
+    .timeline-dot {
+        width: 10px;
+        height: 10px;
+        background: var(--page-bg);
+        border: 2px solid var(--timeline-accent);
+        /* Blue Ring */
+        border-radius: 50%;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 4;
+        box-shadow: 0 0 0 4px var(--page-bg);
+        /* Halo */
+    }
+
+    /* CONNECTING LINES (PC) */
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        height: 1px;
+        background: var(--timeline-line);
+        z-index: 0;
+        width: 0;
+    }
+
+    /* LEFT ITEM: Content Left, Date Right */
+    .timeline-item.left {
+        flex-direction: row;
+    }
+
+    .timeline-item.left .timeline-content-wrapper {
+        text-align: right;
+        margin-right: auto;
+        padding-right: 40px;
+    }
+
+    .timeline-item.left .timeline-date-wrapper {
+        text-align: left;
+        margin-left: auto;
+        padding-left: 40px;
+        justify-content: flex-start;
+        /* Align date pill to left (near spine) */
+    }
+
+    /* Line from Spine (Center) to Date (Right) */
+    .timeline-item.left .timeline-date-wrapper .date-text::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        /* Go left from date pill */
+        width: 40px;
+        /* Reach the spine gap */
+        height: 1px;
+        background: var(--timeline-line);
+    }
+
+
+    /* RIGHT ITEM: Content Right, Date Left */
+    .timeline-item.right {
+        flex-direction: row-reverse;
+    }
+
+    .timeline-item.right .timeline-content-wrapper {
+        text-align: left;
+        margin-left: auto;
+        padding-left: 40px;
+    }
+
+    .timeline-item.right .timeline-date-wrapper {
+        text-align: right;
+        margin-right: auto;
+        padding-right: 40px;
+        justify-content: flex-end;
+        /* Align date pill to right (near spine) */
+    }
+
+    /* Line from Date (Left) to Spine (Center) */
+    .timeline-item.right .timeline-date-wrapper .date-text::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        /* Go right from date pill */
+        width: 40px;
+        /* Reach the spine gap */
+        height: 1px;
+        background: var(--timeline-line);
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+        .timeline-container {
+            padding-left: 0;
+            padding-right: 0;
+            max-width: 100% !important;
+        }
+
+        /* SPINE: Fixed left rail */
+        .timeline-spine {
+            left: 20px;
+            transform: none;
+            width: 1px;
+        }
+
+        /* MONTH HEADER */
+        .month-header-wrapper {
+            margin: 0 0 30px 10px;
+            /* Indent slightly */
+            padding: 4px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* ITEM: Stacked (Reset Flex) */
+        .timeline-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            margin-left: 50px !important;
+            /* Content start */
+            margin-right: 15px !important;
+            margin-bottom: 40px !important;
+            width: auto !important;
+        }
+
+        /* DOT */
+        .timeline-dot {
+            left: -30px;
+            /* 50 - 30 = 20px spine relative to item margin */
+            top: 13px;
+            /* Align with center of Date Pill */
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            border-width: 2px;
+        }
+
+        /* WRAPPERS - RESET SPECIFICITY LEAKS FROM .left/.right */
+        .timeline-content-wrapper,
+        .timeline-date-wrapper {
+            width: 100% !important;
+            text-align: left !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .timeline-date-wrapper {
+            justify-content: flex-start !important;
+            /* Always left align */
+            order: -1;
+            margin-bottom: 8px;
+        }
+
+        /* DATE PILL (Mobile) */
+        .timeline-date-wrapper .date-text {
+            /* Pill style inherited but sizes adjusted */
+            padding: 4px 12px;
+            font-size: 0.75rem;
+        }
+
+        /* RESET DESKTOP CONNECTORS (Use High Specificity) */
+        .timeline-item .timeline-date-wrapper .date-text::before,
+        .timeline-item .timeline-date-wrapper .date-text::after {
+            display: none !important;
+        }
+
+        /* MOBILE CONNECTOR: Line from Dot to Date Pill (Override Reset) */
+        .timeline-item .timeline-date-wrapper .date-text::before {
+            display: block !important;
+            position: absolute;
+            content: '';
+            width: 30px;
+            height: 1px;
+            background: var(--timeline-line);
+            top: 50%;
+            right: 100%;
+            /* Extend left from pill */
+            left: auto;
+        }
+
+        /* CONTENT */
+        .timeline-title {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        /* CARD */
+        .timeline-card {
+            padding: 0;
+            background: transparent;
+            border: none;
+        }
+    }
+</style>
+
+<script>
+    function toggleMonth(header) {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.toggle-icon');
+
+        if (content.style.display === "none") {
+            content.style.display = "block";
+            icon.classList.add('rotated');
+        } else {
+            content.style.display = "none";
+            icon.classList.remove('rotated');
+        }
+    }
+</script>

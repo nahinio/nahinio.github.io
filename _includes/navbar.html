@@ -1,0 +1,252 @@
+<nav class="navbar navbar-expand-lg navbar-themed">
+
+    <!-- Global Font Injection -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Apply Global Font Stack 
+           English fonts (default/bootstrap) come first,
+           Hind Siliguri takes over for Bangla characters. */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Hind Siliguri", sans-serif !important;
+        }
+    </style>
+
+    <style>
+        .navbar-logo-light {
+            display: inline-block;
+        }
+
+        .navbar-logo-dark {
+            display: none;
+        }
+
+        [data-theme="dark"] .navbar-logo-light {
+            display: none;
+        }
+
+        [data-theme="dark"] .navbar-logo-dark {
+            display: inline-block;
+        }
+
+        /* Ensure underline effect is REMOVED for logo on hover 
+           Target both the brand link and any potential children or pseudo-elements */
+        .navbar-brand,
+        .navbar-brand:hover,
+        .navbar-brand:focus,
+        .navbar-brand:active {
+            text-decoration: none !important;
+            border-bottom: none !important;
+            background-image: none !important;
+            /* Cover gradient underlines */
+            box-shadow: none !important;
+            /* Cover box-shadow underlines */
+        }
+
+        /* Animated Theme Toggle */
+        /* TREAT CONTAINER LIKE A NORMAL NAV LINK FOR ALIGNMENT */
+        .theme-toggle-container {
+            cursor: pointer;
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+            /* Vertically center the inner wrapper */
+            justify-content: center;
+            /* Inherit padding from bootstrap .nav-link implicitly or keep it standard if needed */
+            /* Bootstrap nav-link usually has padding: .5rem 1rem; */
+        }
+
+        /* Inner wrapper for the absolute icons to sit in */
+        .toggle-icon-wrapper {
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* FORCE Remove underline/border from theme toggle on hover and focus 
+           Use high specificity to override any theme defaults */
+        .navbar-nav .nav-link.theme-toggle-container,
+        .theme-toggle-container:hover,
+        .theme-toggle-container:focus,
+        .theme-toggle-container:active {
+            text-decoration: none !important;
+            border-bottom: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+
+        .theme-toggle-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .theme-icon-sun {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+        }
+
+        .theme-icon-moon {
+            opacity: 0;
+            transform: scale(0) rotate(-90deg);
+        }
+
+        [data-theme="dark"] .theme-icon-sun {
+            opacity: 0;
+            transform: scale(0) rotate(90deg);
+        }
+
+        [data-theme="dark"] .theme-icon-moon {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+        }
+
+        /* Mobile Fixes */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: inherit;
+                z-index: 1000;
+                text-align: center;
+                padding-top: 20px;
+                width: 100%;
+            }
+
+            .navbar-nav {
+                width: 100%;
+                display: block;
+                /* Stack items */
+            }
+
+            .navbar-brand {
+                z-index: 1001;
+                position: relative;
+                margin-bottom: 0;
+            }
+
+            /* Text links on mobile */
+            .navbar-nav .nav-link {
+                padding: 10px 0;
+                display: inline-block;
+                width: auto;
+                margin: 0 auto;
+            }
+
+            .navbar-nav .nav-item {
+                text-align: center;
+                display: block;
+                width: 100%;
+            }
+
+            /* Fix Toggle Visibility and Alignment on Mobile */
+            .navbar-nav .nav-link.theme-toggle-container {
+                margin: 20px auto;
+                display: flex !important;
+                /* Force flex for centering */
+                width: auto !important;
+                /* Let it wrap the 24px icon + padding */
+                height: auto !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+
+            .navbar-nav .nav-item.toggle-item {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
+        }
+    </style>
+
+    <a class="navbar-brand" href="{{ site.baseurl }}/">
+        <img src="https://i.imgur.com/NSIkTOv.png" class="navbar-logo-light" alt="{{ site.title }}"
+            style="max-height: 40px;">
+        <img src="https://i.imgur.com/WbWTkRq.png" class="navbar-logo-dark" alt="{{ site.title }}"
+            style="max-height: 40px;">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-1x fa-bars text-themed"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav ml-auto">
+
+            {%- assign html_pages = site.html_pages | sort: 'weight' -%}
+            {%- assign filtered_pages = "" | split: "" -%}
+
+            {%- for html_page in html_pages -%}
+
+            {%- assign exclude = false -%}
+
+            {%- for exclude_path in site.nav_exclude -%}
+
+            {%- if html_page.path == exclude_path -%}
+            {%- assign exclude = true -%}
+            {%- break -%}
+            {%- elsif exclude_path contains '**' -%}
+            {%- assign match = exclude_path | remove: '**' -%}
+            {%- if html_page.path contains match -%}
+            {%- assign exclude = true -%}
+            {%- break -%}
+            {%- endif -%}
+            {%- endif -%}
+
+            {%- endfor -%}
+
+            {%- unless exclude -%}
+            {%- assign filtered_pages = filtered_pages | push: html_page -%}
+            {%- endunless -%}
+
+            {%- endfor -%}
+
+            {% for html_page in filtered_pages %}
+
+            {%- if page.url contains html_page.url -%}
+            {%- assign active_status = "active" -%}
+            {%- else -%}
+            {%- assign active_status = "" -%}
+            {%- endif -%}
+
+            {%- if html_page.external_url -%}
+            {%- assign url = html_page.external_url -%}
+            {%- else -%}
+            {%- assign url = html_page.url | relative_url -%}
+            {%- endif -%}
+
+            <div class="nav-item"> <!-- Wrap in nav-item for better stacking -->
+                <a class="nav-link {{ active_status }}" href="{{ url }}" {%- if html_page.external_url and
+                    site.open_new_tab -%} target="_blank" {%- endif -%}>{{ html_page.title }}</a>
+            </div>
+
+            {% endfor %}
+
+            <div class="nav-item toggle-item"> <!-- Wrap toggle too with specific class -->
+                <div class="nav-link theme-toggle-container" onclick="toggleTheme()" title="Toggle Theme">
+                    <div class="toggle-icon-wrapper">
+                        <!-- Sun Icon -->
+                        <svg class="theme-toggle-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z" />
+                        </svg>
+                        <!-- Moon Icon -->
+                        <svg class="theme-toggle-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</nav>

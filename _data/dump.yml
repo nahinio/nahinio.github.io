@@ -1,0 +1,23 @@
+- image_url: "https://i.imgur.com/qTeeVsh.png"
+  tags: ["Digital", "Dark"]
+  title: "First Capture"
+  info: "A random demo shot showing the possibilities."
+  date: "2023-11-15"
+  link_url: "https://example.com"
+  link_text: "See Source"
+
+- image_url: "https://i.imgur.com/NSIkTOv.png"
+  tags: ["Design", "Minimal"]
+  title: "Clean Design"
+  info: "Minimalist structures often lead to clarity."
+  date: "2024-01-20"
+  link_url: "https://google.com"
+  link_text: "Visit Site"
+
+- image_url: "https://i.imgur.com/WbWTkRq.png"
+  tags: ["Dark", "Concept"]
+  title: "Night Mode"
+  info: "Exploring the depth of dark themed interfaces."
+  date: "2024-03-05"
+  link_url: "#"
+  link_text: "No Link"

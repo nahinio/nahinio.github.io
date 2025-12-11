@@ -1,0 +1,437 @@
+---
+layout: default
+permalink: /hall-of-me/
+title: Hall of me
+weight: 3
+---
+
+<!-- 
+    Hall of me Section
+    Structure:
+    1. Certifications (First)
+    2. Dump/Gallery (Second)
+    Features:
+    - Organization info in modal
+    - Reordered sections
+    - Renamed Title
+-->
+
+<div class="container mt-5">
+
+    <!-- PAGE HEADER -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-12 text-center">
+            <h2 class="font-weight-bold" style="color: var(--secondary);">Hall of me</h2>
+            <p class="text-muted">A showcase of my journey and visuals.</p>
+        </div>
+    </div>
+
+    <!-- CERTIFICATIONS SECTION (FIRST) -->
+    <div class="row justify-content-center mb-3">
+        <div class="col-12">
+            <h4 class="font-weight-bold"
+                style="color: var(--secondary); border-left: 4px solid var(--blue-border); padding-left: 15px;">
+                Certifications</h4>
+        </div>
+    </div>
+
+    <div class="row mb-5" id="cert-grid">
+        {% for item in site.data.certifications %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <!-- Cert Card: Name is visible below image -->
+            <div class="card h-100 dump-card"
+                onclick="openModal('{{ item.image_url }}', '{{ item.name | escape }}', '{{ item.details | escape }}', '{{ item.date }}', '{{ item.credential_url }}', 'Credential', '{{ item.organization | escape }}')">
+                <div class="card-img-wrapper">
+                    <img src="{{ item.image_url }}" class="card-img-top dump-img" alt="{{ item.name }}">
+                    <div class="img-overlay">
+                        <span class="overlay-text">View Details</span>
+                    </div>
+                </div>
+                <div class="card-body p-3 text-center">
+                    <h5 class="card-title mb-1" style="font-size: 1.1rem; font-weight: 700; color: var(--secondary);">{{
+                        item.name }}</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">{{ item.organization }}</p>
+                    <small class="text-muted"><i class="far fa-calendar-alt mr-1"></i> {{ item.date }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- GALLERY SECTION (SECOND) -->
+    <div class="row justify-content-center mt-5 mb-3">
+        <div class="col-12">
+            <hr class="mb-5" style="border-color: rgba(138, 180, 248, 0.2);">
+            <h4 class="font-weight-bold"
+                style="color: var(--secondary); border-left: 4px solid var(--blue-border); padding-left: 15px;">Gallery
+            </h4>
+        </div>
+    </div>
+
+    <!-- Tag Filter Buttons -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center" id="tag-filters">
+            <button class="btn btn-sm btn-outline-theme active-filter mx-1 my-1"
+                onclick="filterGallery('all')">All</button>
+            {% assign all_tags = "" | split: "," %}
+            {% for item in site.data.dump %}
+            {% for tag in item.tags %}
+            {% assign all_tags = all_tags | push: tag %}
+            {% endfor %}
+            {% endfor %}
+            {% assign unique_tags = all_tags | uniq | sort %}
+
+            {% for tag in unique_tags %}
+            <button class="btn btn-sm btn-outline-theme mx-1 my-1" onclick="filterGallery('{{ tag }}')">{{ tag
+                }}</button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Gallery Grid -->
+    <div class="row" id="gallery-grid">
+        {% for item in site.data.dump %}
+        <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-tags="{{ item.tags | join: ',' }}">
+            <!-- Note: passing 'More' as button text, empty organization -->
+            <div class="card h-100 dump-card"
+                onclick="openModal('{{ item.image_url }}', '{{ item.title | escape }}', '{{ item.info | escape }}', '{{ item.date }}', '{{ item.link_url }}', 'More', '')">
+                <div class="card-img-wrapper">
+                    <img src="{{ item.image_url }}" class="card-img-top dump-img" alt="{{ item.title }}">
+                    <div class="img-overlay">
+                        <span class="overlay-text">View Info</span>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <div class="mb-2">
+                        {% for tag in item.tags %}
+                        <span class="badge badge-custom">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- Modal -->
+<div id="dumpModal" class="dump-modal" onclick="closeModal(event)">
+    <div class="dump-modal-content">
+        <span class="close-btn" onclick="closeModal(event)">&times;</span>
+        <div class="modal-layout">
+            <div class="modal-img-container">
+                <img id="modalImage" src="" alt="">
+            </div>
+            <div class="modal-info-container">
+                <h3 id="modalTitle"></h3>
+
+                <!-- Organization Display -->
+                <div id="modalOrgSection" class="mb-2"
+                    style="display:none; align-items: center; color: var(--secondary);">
+                    <i class="fas fa-building mr-2" style="color: var(--blue-border); font-size: 1.1rem;"></i>
+                    <span id="modalOrg" style="font-weight: 600; font-size: 1rem;"></span>
+                </div>
+
+                <!-- Date Display -->
+                <p class="text-muted mb-3"><small><i class="far fa-calendar-alt mr-2"></i><span
+                            id="modalDate"></span></small></p>
+
+                <p id="modalInfo"></p>
+                <a id="modalLink" href="#" target="_blank" class="btn btn-theme-blue mt-3"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* VARIABLES */
+    :root {
+        --blue-border: #8ab4f8;
+    }
+
+    [data-theme="dark"] {
+        --card-bg: #1a1a1a;
+        --blue-border: #8ab4f8;
+    }
+
+    [data-theme="light"] {
+        --card-bg: #ffffff;
+        --blue-border: #0056b3;
+    }
+
+    /* FILTERS */
+    .btn-outline-theme {
+        border-radius: 20px;
+        border: 1px solid var(--secondary);
+        color: var(--secondary);
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-theme:hover,
+    .btn-outline-theme.active-filter {
+        background-color: var(--blue-border);
+        border-color: var(--blue-border);
+        color: #fff;
+    }
+
+    /* CARD STYLING */
+    .dump-card {
+        background-color: var(--card-bg);
+        border: 1px solid rgba(138, 180, 248, 0.3);
+        /* Thin blueish border */
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .dump-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        border-color: var(--blue-border);
+    }
+
+    .card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        padding-top: 75%;
+        /* 4:3 Aspect Ratio */
+    }
+
+    .dump-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .dump-card:hover .dump-img {
+        transform: scale(1.05);
+    }
+
+    /* OVERLAY */
+    .img-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .dump-card:hover .img-overlay {
+        opacity: 1;
+    }
+
+    .overlay-text {
+        color: white;
+        font-weight: 600;
+        border: 1px solid white;
+        padding: 5px 15px;
+        border-radius: 20px;
+    }
+
+    /* BADGES */
+    .badge-custom {
+        font-weight: 500;
+        padding: 5px 10px;
+        border-radius: 4px;
+        background-color: rgba(138, 180, 248, 0.1);
+        color: var(--blue-border);
+        border: 1px solid rgba(138, 180, 248, 0.2);
+        margin-right: 5px;
+        font-size: 0.75rem;
+    }
+
+    /* MODAL */
+    .dump-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        animation: fadeIn 0.3s;
+    }
+
+    .dump-modal-content {
+        margin: 5% auto;
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        width: 80%;
+        max-width: 900px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--blue-border);
+    }
+
+    .modal-layout {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .modal-img-container {
+        flex: 1 1 50%;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-img-container img {
+        max-width: 100%;
+        max-height: 80vh;
+        width: auto;
+        height: auto;
+    }
+
+    .modal-info-container {
+        flex: 1 1 300px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .close-btn {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        z-index: 10001;
+        cursor: pointer;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+        color: var(--secondary);
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #modalTitle {
+        margin-top: 0;
+        font-weight: 700;
+        color: var(--secondary);
+    }
+
+    #modalInfo {
+        margin-top: 5px;
+        color: var(--secondary);
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    .btn-theme-blue {
+        background-color: transparent;
+        border: 1px solid var(--blue-border);
+        color: var(--blue-border);
+        align-self: flex-start;
+        border-radius: 6px;
+        padding: 8px 20px;
+        transition: all 0.3s;
+    }
+
+    .btn-theme-blue:hover {
+        background-color: var(--blue-border);
+        color: white;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0
+        }
+
+        to {
+            opacity: 1
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dump-modal-content {
+            width: 95%;
+            margin: 10% auto;
+        }
+    }
+</style>
+
+<script>
+    function filterGallery(tag) {
+        const buttons = document.querySelectorAll('#tag-filters button');
+        buttons.forEach(btn => {
+            if (btn.innerText === tag || (tag === 'all' && btn.innerText === 'All')) {
+                btn.classList.add('active-filter');
+            } else {
+                btn.classList.remove('active-filter');
+            }
+        });
+
+        const items = document.querySelectorAll('.gallery-item');
+        items.forEach(item => {
+            const itemTags = item.getAttribute('data-tags').split(',');
+            if (tag === 'all' || itemTags.includes(tag)) {
+                item.style.display = 'block';
+                item.style.opacity = '1';
+            } else {
+                item.style.display = 'none';
+                item.style.opacity = '0';
+            }
+        });
+    }
+
+    // UPDATED: Added organization parameter
+    function openModal(imgUrl, title, info, date, linkUrl, buttonText, organization) {
+        const modal = document.getElementById('dumpModal');
+        const modalImg = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalInfo = document.getElementById('modalInfo');
+        const modalDate = document.getElementById('modalDate');
+        const modalLink = document.getElementById('modalLink');
+        const modalOrgSection = document.getElementById('modalOrgSection');
+        const modalOrg = document.getElementById('modalOrg');
+
+        modal.style.display = "block";
+        modalImg.src = imgUrl;
+        modalTitle.innerText = title;
+        modalInfo.innerText = info;
+        modalDate.innerText = date ? date : '';
+
+        // Handle Organization
+        if (organization) {
+            modalOrgSection.style.display = "flex";
+            modalOrg.innerText = organization;
+        } else {
+            modalOrgSection.style.display = "none";
+        }
+
+        if (linkUrl && linkUrl !== '#') {
+            modalLink.href = linkUrl;
+            modalLink.innerText = buttonText ? buttonText : 'More';
+            modalLink.style.display = 'inline-block';
+        } else {
+            modalLink.style.display = 'none';
+        }
+    }
+
+    function closeModal(event) {
+        if (event.target.id === 'dumpModal' || event.target.classList.contains('close-btn')) {
+            document.getElementById('dumpModal').style.display = "none";
+        }
+    }
+</script>
