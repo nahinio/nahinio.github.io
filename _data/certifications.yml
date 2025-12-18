@@ -11,3 +11,10 @@
   date: "2023-12-05"
   credential_url: "https://example.com/cert2"
   image_url: "https://i.imgur.com/WbWTkRq.png"
+
+- name: "Gold Medalist at BeatCode 253"
+  organization: "UIU Competitive Programming Community"
+  details: "Won a Gold Medal and placed 2nd in BeatCode 253, an Intra UIU Junior Programming Contest organized by the UIU Competitive Programming Community, by solving 7 out of 11 problems under standard competitive constraints and time pressure."
+  date: "2025-12-05"
+  credential_url: "https://codeforces.com/gym/656262/standings"
+  image_url: "https://i.imgur.com/NaeWMX3.png"
